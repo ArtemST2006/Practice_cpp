@@ -115,7 +115,7 @@ void VKStyleWindow::selectChat(QListWidgetItem* item){
     int chatId = item->data(Qt::UserRole).toInt();
     // Здесь можно загрузить историю чата по chatId
     chatHistory->clear();
-    chatHistory->addItem("Выбран чат: " + item->text());
+    chatHistory->addItem("Выбран чат: " + chatId);
 }
 
 // void sendMessage() {

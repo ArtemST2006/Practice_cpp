@@ -39,6 +39,7 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                 if (msg.type == 0){ //прислали имя
                     append_json(fd, msg.buffer); send_json();
                     lis[fd] = msg.buffer;
+                    storage.add_user(lis[fd]); //add to database
                 }
                 else if (msg.type == 1){
                     message msg_new;

@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <nlohmann/json.hpp> 
+#include "../database_dir/database.h"
 
 using std::cout;  
 using std::endl;
@@ -23,7 +24,7 @@ class Server {
             int occused; // откого
             int adress; // optional куда
         };
-
+        Storage storage;
         int socket_fd;
         char buffer[1024];
         std::map<const int, std::string> lis; // fd(id), name
@@ -40,7 +41,7 @@ class Server {
         Server(const Server&) = delete;
         Server& operator=(const Server&) = delete;
         
-        Server(int port) { data = json::array(); settings(port); } 
+        Server(int port, const string database_path) : storage(database_path){ data = json::array(); settings(port);} 
         
         ~Server() {
             if (socket_fd != -1) {

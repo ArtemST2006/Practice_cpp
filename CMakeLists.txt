@@ -10,10 +10,9 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Поиск необходимых Qt компонентов
+# Поиск необходимых компонентов
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
-# ИЛИ для Qt6:
-# find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network)
+find_package(SQLite3 REQUIRED)  # Добавлен поиск SQLite
 
 # Установка выходной директории
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
@@ -29,26 +28,21 @@ add_executable(client
 add_executable(server 
     server_dir/server.cpp 
     server_dir/server_func.cpp
+    database_dir/database.cpp  # Добавлен файл базы данных
 )
 
-# Подключение библиотек для клиента (с Qt)
+# Подключение библиотек для клиента
 target_link_libraries(client PRIVATE
     Qt5::Core
     Qt5::Widgets
     Qt5::Network
-    # ИЛИ для Qt6:
-    # Qt6::Core
-    # Qt6::Widgets
-    # Qt6::Network
 )
 
-# Подключение библиотек для сервера (только Qt Network)
+# Подключение библиотек для сервера
 target_link_libraries(server PRIVATE
     Qt5::Core
     Qt5::Network
-    # ИЛИ для Qt6:
-    # Qt6::Core
-    # Qt6::Network
+    SQLite::SQLite3  # Добавлена SQLite библиотека
 )
 
 # Для Windows дополнительно подключаем Winsock
@@ -60,4 +54,12 @@ endif()
 # Дополнительные настройки для Qt
 target_compile_definitions(client PRIVATE
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
+)
+
+# Добавляем пути к заголовочным файлам
+include_directories(
+    ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5Widgets_INCLUDE_DIRS}
+    ${Qt5Network_INCLUDE_DIRS}
+    ${SQLite3_INCLUDE_DIRS}  # Добавлены пути SQLite
 )
