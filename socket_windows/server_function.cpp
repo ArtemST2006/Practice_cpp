@@ -70,12 +70,15 @@ void communication(SOCKET clientSocket){
         }
 
         SOCKET right_client;
-        for (auto x: all_clients){
-            if (x.first != std::this_thread::get_id())
-                right_client = x.second;
+        int index = 0;
+        for (auto it = all_clients.begin(); it != all_clients.end(); it++, ++index){
+            if (it->first != std::this_thread::get_id()){
+                right_client = it->second; 
+                break;
+            }
         }
-        send(right_client, buffer, strlen(buffer), 0);
-
+        std::string buff = "Client" + std::to_string(index % 2) + ": " + buffer;
+        send(right_client, buff.c_str(), strlen(buff.c_str()), 0);
     }
 
     closesocket(clientSocket);

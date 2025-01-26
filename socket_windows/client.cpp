@@ -21,13 +21,18 @@ int main (){
         }
         else{
             buffer[received] = '\0';
-            cout << "Server: " << buffer << endl;
+            cout << buffer << endl;
             if (strcmp(buffer, "Waiting") == 0)
                 continue;
         }
 
         cout << "Enter: ";
-        cin.getline(message, sizeof(message));
+        while(cin.getline(message, sizeof(message))){
+            if (strlen(message) != 0)
+                break;
+            cout << "Enter again: ";
+        }
+
         if (send(clientSocket, message, strlen(message), 0) == SOCKET_ERROR) {
             std::cerr << "Send failed: " << WSAGetLastError() << std::endl;
             break;
