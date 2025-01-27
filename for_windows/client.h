@@ -19,3 +19,4 @@ using std::cerr;
 bool connect_server(SOCKET& , sockaddr_in& );
 SOCKET settings();
 void receiv(SOCKET clientSocket);
+int windows_client();

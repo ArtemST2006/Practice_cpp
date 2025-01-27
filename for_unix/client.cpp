@@ -41,7 +41,7 @@ void receiveMessages(int socketHandle) {
     }
 }
 
-int main() {
+int unix_client() {
     struct sockaddr_in remoteSocketInfo;
     struct hostent* hPtr;
     int socketHandle;

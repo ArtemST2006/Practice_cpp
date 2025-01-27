@@ -15,3 +15,4 @@ extern std::map<std::thread::id, SOCKET> all_clients;
 SOCKET settings(int port);
 void communication(SOCKET clientSocket);
 void waiting(SOCKET& clientSocket);
+int windows_server();

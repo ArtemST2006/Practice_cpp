@@ -3,7 +3,7 @@
 
 std::map<std::thread::id, SOCKET> all_clients;
 
-int main(){
+int windows_server(){
     SOCKET serverSocket = settings(8080);
     if (serverSocket == INVALID_SOCKET)
         return 1;

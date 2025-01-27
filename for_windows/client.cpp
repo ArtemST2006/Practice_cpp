@@ -1,7 +1,7 @@
 #include "client.h"
 
 
-int main (){
+int windows_client (){
     //создание и привязка сокета
     SOCKET clientSocket = settings();
     if (clientSocket == INVALID_SOCKET)

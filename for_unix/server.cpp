@@ -40,7 +40,7 @@ void handleClient(int socketConnection) {
 }
 
 
-int main() {
+int unix_server() {
     struct sockaddr_in socketInfo;
     char sysHost[MAXHOSTNAME + 1];
     struct hostent* hPtr;
