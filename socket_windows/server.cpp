@@ -15,8 +15,8 @@ int main() {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             continue;
         }
-
-        SOCKET client_socket = accept(serverSocket, nullptr, nullptr);
+        else 
+            SOCKET client_socket = accept(serverSocket, nullptr, nullptr);
 
         if (client_socket == INVALID_SOCKET) {
             std::cerr << "Ошибка подключения клиента.\n";

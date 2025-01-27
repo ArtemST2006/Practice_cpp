@@ -77,7 +77,7 @@ void communication(SOCKET clientSocket){
                 break;
             }
         }
-        std::string buff = "Client" + std::to_string(index % 2) + ": " + buffer;
+        std::string buff = "Client" + std::to_string(index % 2 + 1) + ": " + buffer;
         send(right_client, buff.c_str(), strlen(buff.c_str()), 0);
     }
 
