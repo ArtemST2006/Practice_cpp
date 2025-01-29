@@ -1,3 +1,5 @@
+#ifdef _WIN32
+
 #include "client.h"
 
 
@@ -39,3 +41,4 @@ int windows_client (){
     return 0;
 }
 
+#endif

@@ -1,1 +1,1 @@
-# Practice_cpp
+# g++ -o server server/main_server.cpp server/windows/server.cpp server/windows/server_func.cpp server/unix/server.cpp -lws2_32

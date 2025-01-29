@@ -1,9 +1,9 @@
 
 
 #ifdef _WIN32 
-#include "for_windows/server.h"
+#include "windows/server.h"
 #elif __unix__
-#include "for_unix/server.cpp"
+#include "unix/server.h"
 #endif
 
 int main (){

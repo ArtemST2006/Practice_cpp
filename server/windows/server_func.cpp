@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include "server.h"
 
 // void waiting(SOCKET& clientSocket){
@@ -76,7 +77,8 @@ SOCKET settings(int port = 8080){
         WSACleanup();
         return INVALID_SOCKET;
     }
-    std::cout << "Server is listening on port 8080..." << std::endl;
+    std::cout << "Listening on port 8080..." << std::endl;
 
     return serverSocket;
 }
+#endif

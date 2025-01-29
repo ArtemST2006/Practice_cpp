@@ -1,20 +1,5 @@
-#include <iostream>
-#include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/wait.h>
-#include <netdb.h>
-#include <stdlib.h>
-#include <thread>
-#include <strings.h>
-#include <stdio.h>
-#include <errno.h>
-#include <unistd.h>
-#include <signal.h>
-#include <vector>
-#include <netinet/in.h>
-
-#define MAXHOSTNAME 256
+#ifdef __unix__
+#include "server.h"
 
 using namespace std;
 int coutOfConnections = 0;
@@ -98,3 +83,4 @@ int unix_server() {
 	}
     return 0;
 }
+#endif

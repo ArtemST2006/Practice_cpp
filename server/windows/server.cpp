@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include "server.h"
 
 
@@ -43,7 +44,7 @@ int windows_server(){
 
     return 0;
 }
-
+#endif
 
 
 

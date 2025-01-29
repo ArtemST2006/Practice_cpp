@@ -1,9 +1,9 @@
 
 
 #ifdef _WIN32
-#include "for_windows/client.h"
+#include "windows/client.h"
 #elif __unix__
-#include "for_unix/client.cpp"
+#include "unix/client.h"
 #endif
 
 int main (){

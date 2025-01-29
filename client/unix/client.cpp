@@ -1,17 +1,7 @@
-#include <iostream>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <thread>
-#include <mutex>
+#ifdef __unix__
 
-#define MAXHOSTNAME 256
+#include "client.h"
 
-using namespace std;
 
 mutex consoleMutex;
 
@@ -92,3 +82,5 @@ int unix_client() {
     close(socketHandle);
     return 0;
 }
+
+#endif

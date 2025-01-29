@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include "client.h"
 
 
@@ -63,3 +64,4 @@ SOCKET settings(){
 
     return clientSocket;
 }
+#endif
