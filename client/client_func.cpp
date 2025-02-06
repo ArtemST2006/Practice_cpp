@@ -2,18 +2,14 @@
 
 
 #ifdef _WIN32
-    void receiv(socket_t clientSocket) {
-    char buffer[1024];
-    while (true) {
-        memset(buffer, 0, sizeof(buffer));
-        if (recv(clientSocket, buffer, 1024, 0) == SOCKET_ERROR) break;
-        decoding(buffer, code);
-        cout << buffer << endl;
-    }
-}
+void receiv(socket_t clientSocket) 
 #else
-void* receiv(void* clientSocket2) {
+void* receiv(void* clientSocket2) 
+#endif
+{
+    #ifndef _WIN32
     socket_t clientSocket = *((socket_t*)clientSocket2);
+    #endif
     char buffer[1024];
     while (true) {
         memset(buffer, 0, sizeof(buffer));
@@ -21,9 +17,11 @@ void* receiv(void* clientSocket2) {
         decoding(buffer, code);
         cout << buffer << endl;
     }
+    
+    #if defined(__unix) || defined(__APPLE__)
     return nullptr;
+    #endif
 }
-#endif
 
 bool connect_server(socket_t& clientSocket, sockaddr_in& serverAddr) {
     int timeout = 0;

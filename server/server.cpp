@@ -32,14 +32,13 @@ int main() {
         std::thread new_thread(communication, clientSocket);
         all_clients[new_thread.get_id()] = clientSocket;
         threads.push_back(std::move(new_thread));
-        std::cout << "Client connected" << std::endl;
         #else
         pthread_t thread_communication;
         pthread_create(&thread_communication, nullptr, communication, &clientSocket);
         Clients.push_back(clientSocket);
         all_clients.insert(clientSocket);
-        std::cout << "Client connected" << std::endl;
         #endif
+        std::cout << "Client connected" << std::endl;
     }
     #ifdef _WIN32
     for (auto& client : all_clients) {

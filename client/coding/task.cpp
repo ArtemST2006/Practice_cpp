@@ -1,4 +1,5 @@
 #include <string>
+#include <cstring>
 
 const int SIZE_OF_ALPH = 26;
 const char FIRST_EL = 'a';
@@ -15,6 +16,7 @@ void encoding(char *lis, const std::string& code){
 }
 
 void decoding(char *lis, const std::string& code){
+    if (strcmp(lis, "Connected") == 0 || strcmp(lis, "You are alone") == 0) return;
     int sdvig_of_decode = std::stoi(code);
     for(int i = 0; lis[i] != '\0'; i++) {
         char now_char = lis[i];
