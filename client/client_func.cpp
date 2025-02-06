@@ -1,5 +1,17 @@
 #include "client.h"
 
+
+#ifdef _WIN32
+    void receiv(socket_t clientSocket) {
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        if (recv(clientSocket, buffer, 1024, 0) == SOCKET_ERROR) break;
+        decoding(buffer, code);
+        cout << buffer << endl;
+    }
+}
+#else
 void* receiv(void* clientSocket2) {
     socket_t clientSocket = *((socket_t*)clientSocket2);
     char buffer[1024];
@@ -11,6 +23,7 @@ void* receiv(void* clientSocket2) {
     }
     return nullptr;
 }
+#endif
 
 bool connect_server(socket_t& clientSocket, sockaddr_in& serverAddr) {
     int timeout = 0;

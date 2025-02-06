@@ -19,19 +19,21 @@ int main() {
     cin.ignore();
 
     char message[1024];
-    pthread_t thread_recive;
 
+    #ifdef _WIN32
+        std::thread new_thread(receiv, clientSocket); // Используем std::thread на Windows
+    #else
+        pthread_t thread_recive;
+        pthread_create(&thread_recive, nullptr, receiv, &clientSocket); // Используем pthread на Linux
+    #endif
 
-
-    pthread_create(&thread_recive, nullptr, receiv, &clientSocket);
     while (true) {
         memset(message, 0, sizeof(message));
         cin.getline(message, sizeof(message));
 
         if (strcmp(message, "stop") == 0) break;
-
-        memmove(message + strlen(name), message, strlen(name) + 1);
-        memcpy(message, name, strlen(name));
+        memmove(message + strlen(name), message, strlen(message) + 1);
+        memcpy(message, name, strlen(name)); 
         encoding(message, code);
 
         if (send(clientSocket, message, strlen(message), 0) == SOCKET_ERROR) break;
@@ -41,6 +43,12 @@ int main() {
 
     #ifdef _WIN32
         WSACleanup();
+    #endif
+
+    #ifdef _WIN32
+        new_thread.join(); // Ожидаем завершения потока на Windows
+    #else
+        pthread_join(thread_recive, nullptr); // Ожидаем завершения потока на Linux
     #endif
 
     return 0;

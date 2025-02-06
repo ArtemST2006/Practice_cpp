@@ -8,8 +8,41 @@ void close_connection(socket_t& client){
     close(client);
     #endif
 }
+#ifdef _WIN32
+void communication(socket_t clientSocket) {
+    for (auto& client : all_clients) {
+        if (client.first != std::this_thread::get_id()) {
+            send(client.second, "Connected", strlen("Connected"), 0);
+        }
+    }
 
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        int bytes_received = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (bytes_received <= 0) {
+            std::cerr << "Client disconnected" << std::endl;
+            break;
+        }
+        std::cout << buffer << std::endl;
+        for (auto& client : all_clients) {
+            if (client.first != std::this_thread::get_id()) {
+                send(client.second, buffer, bytes_received, 0);
+            }
+        }
+    }
+    all_clients.erase(std::this_thread::get_id());
+    if (all_clients.size() == 1) {
+        send(all_clients.begin()->second, "You are alone", strlen("You are alone"), 0);
+    }
 
+    #ifdef _WIN32
+    closesocket(clientSocket);
+    #else
+    close(clientSocket);
+    #endif
+}
+#else
 void* communication(void* clientSocket2) {
     socket_t clientSocket = *((socket_t*)clientSocket2);
     for (auto client : all_clients) {
@@ -45,7 +78,7 @@ void* communication(void* clientSocket2) {
     #endif
     return nullptr;
 }
-
+#endif
 
 int setup_server(int port = 8080) {
     #ifdef _WIN32

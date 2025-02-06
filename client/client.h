@@ -1,12 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include <string>
-#include <thread>
 #include <chrono>
 
 #ifdef _WIN32
     #include <winsock2.h>
     #include <windows.h>
+    #include <thread>
     using socket_t = SOCKET; 
     #define CLOSESOCKET closesocket
     #pragma comment(lib, "ws2_32.lib")
