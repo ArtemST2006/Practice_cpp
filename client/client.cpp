@@ -24,9 +24,8 @@ int main() {
         cin.getline(message, sizeof(message));
 
         if (strcmp(message, "stop") == 0) break;
-
-        memmove(message + strlen(name), message, strlen(name) + 1);
-        memcpy(message, name, strlen(name));
+        memmove(message + strlen(name), message, strlen(message) + 1);
+        memcpy(message, name, strlen(name)); 
         encoding(message, code);
 
         if (send(clientSocket, message, strlen(message), 0) == SOCKET_ERROR) break;
