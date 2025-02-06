@@ -1,6 +1,29 @@
+/*  
+===========================================================
+|   CLIENT-SERVER APPLICATION                             |
+|   Simple multi-client server implementation             |
+|   Created by:                                           |
+|   - Arstep (https://github.com/ArtemST2006)             |
+|   - Senpa1ka (https://github.com/Senpa1k)               |
+|   - Glafira (https://github.com/Glafira-Kharitonova)    |
+|                                                         |
+===========================================================
+*/
+
+
+
 #include "client.h"
 
-void receiv(socket_t clientSocket) {
+
+#ifdef _WIN32
+void receiv(socket_t clientSocket) 
+#else
+void* receiv(void* clientSocket2) 
+#endif
+{
+    #ifndef _WIN32
+    socket_t clientSocket = *((socket_t*)clientSocket2);
+    #endif
     char buffer[1024];
     while (true) {
         memset(buffer, 0, sizeof(buffer));
@@ -8,6 +31,10 @@ void receiv(socket_t clientSocket) {
         decoding(buffer, code);
         cout << buffer << endl;
     }
+    
+    #if defined(__unix) || defined(__APPLE__)
+    return nullptr;
+    #endif
 }
 
 bool connect_server(socket_t& clientSocket, sockaddr_in& serverAddr) {

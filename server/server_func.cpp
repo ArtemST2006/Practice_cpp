@@ -1,3 +1,14 @@
+/*  
+===========================================================
+|   CLIENT-SERVER APPLICATION                             |
+|   Simple multi-client server implementation             |
+|   Created by:                                           |
+|   - Arstep (https://github.com/ArtemST2006)             |
+|   - Senpa1ka (https://github.com/Senpa1k)               |
+|   - Glafira (https://github.com/Glafira-Kharitonova)    |
+|                                                         |
+===========================================================
+*/
 #include "server.h"
 
 
@@ -8,8 +19,7 @@ void close_connection(socket_t& client){
     close(client);
     #endif
 }
-
-
+#ifdef _WIN32
 void communication(socket_t clientSocket) {
     for (auto& client : all_clients) {
         if (client.first != std::this_thread::get_id()) {
@@ -43,7 +53,44 @@ void communication(socket_t clientSocket) {
     close(clientSocket);
     #endif
 }
+#else
+void* communication(void* clientSocket2) {
+    socket_t clientSocket = *((socket_t*)clientSocket2);
+    for (auto client : all_clients) {
+        if (client != clientSocket) {
+            send(client, "Connected", strlen("Connected"), 0);
+        }
+    }
 
+    char buffer[1024];
+
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        int bytes_received = recv(clientSocket, buffer, sizeof(buffer), 0);
+        if (bytes_received <= 0) {
+            std::cerr << "Client disconnected" << std::endl;
+            break;
+        }
+        std::cout << buffer << std::endl;
+        for (auto client : all_clients) {
+            if (client != clientSocket) {
+                send(client, buffer, bytes_received, 0);
+            }
+        }
+    }
+    
+    if (all_clients.size() == 1) {
+        send(clientSocket, "You are alone", strlen("You are alone"), 0);
+    }
+
+    #ifdef _WIN32
+    closesocket(clientSocket);
+    #else
+    close(clientSocket);
+    #endif
+    return nullptr;
+}
+#endif
 
 int setup_server(int port = 8080) {
     #ifdef _WIN32
@@ -65,7 +112,7 @@ int setup_server(int port = 8080) {
     sockaddr_in serverAddr {};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(port);
-    serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
 
     if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
         std::cerr << "Bind failed" << std::endl;

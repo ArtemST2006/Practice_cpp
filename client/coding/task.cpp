@@ -1,8 +1,11 @@
 #include <string>
 #include <cstring>
 
+<<<<<<< HEAD
 using namespace std;
 
+=======
+>>>>>>> main
 const int SIZE_OF_ALPH = 26;
 const char FIRST_EL = 'a';
 
