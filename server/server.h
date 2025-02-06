@@ -1,12 +1,12 @@
 #include <iostream>
 #include <cstring>
 #include <map>
-#include <thread>
 #include <vector>
 #include <set>
 
 #ifdef _WIN32
 #include <winsock2.h>
+#include <thread>
 #include <windows.h>
 typedef SOCKET socket_t;  
 

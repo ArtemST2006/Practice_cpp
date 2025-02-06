@@ -2,8 +2,6 @@
 
 std::string code;
 
-
-
 int main() {
     socket_t clientSocket = settings();
     if (clientSocket == INVALID_SOCKET) return 1;
@@ -21,10 +19,10 @@ int main() {
     char message[1024];
 
     #ifdef _WIN32
-        std::thread new_thread(receiv, clientSocket); // Используем std::thread на Windows
+        std::thread new_thread(receiv, clientSocket);
     #else
         pthread_t thread_recive;
-        pthread_create(&thread_recive, nullptr, receiv, &clientSocket); // Используем pthread на Linux
+        pthread_create(&thread_recive, nullptr, receiv, &clientSocket);
     #endif
 
     while (true) {
@@ -46,9 +44,9 @@ int main() {
     #endif
 
     #ifdef _WIN32
-        new_thread.join(); // Ожидаем завершения потока на Windows
+        new_thread.join();
     #else
-        pthread_join(thread_recive, nullptr); // Ожидаем завершения потока на Linux
+        pthread_join(thread_recive, nullptr);
     #endif
 
     return 0;
