@@ -1,3 +1,20 @@
+/*  
+===========================================================
+|   CLIENT-SERVER APPLICATION                             |
+|   Simple multi-client server implementation             |
+|   Created by:                                           |
+|   - Arstep (https://github.com/ArtemST2006)             |
+|   - Senpa1ka (https://github.com/Senpa1k)               |
+|   - Glafira (https://github.com/Glafira-Kharitonova)    |
+|                                                         |
+===========================================================
+*/
+
+
+
+
+
+
 #include "server.h"
 
 #ifdef _WIN32

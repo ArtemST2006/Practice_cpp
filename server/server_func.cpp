@@ -1,3 +1,20 @@
+/*  
+===========================================================
+|   CLIENT-SERVER APPLICATION                             |
+|   Simple multi-client server implementation             |
+|   Created by:                                           |
+|   - Arstep (https://github.com/ArtemST2006)             |
+|   - Senpa1ka (https://github.com/Senpa1k)               |
+|   - Glafira (https://github.com/Glafira-Kharitonova)    |
+|                                                         |
+===========================================================
+*/
+
+
+
+
+
+
 #include "server.h"
 
 
@@ -53,7 +70,7 @@ void* communication(void* clientSocket2) {
     }
 
     char buffer[1024];
-    
+
     while (true) {
         memset(buffer, 0, sizeof(buffer));
         int bytes_received = recv(clientSocket, buffer, sizeof(buffer), 0);
