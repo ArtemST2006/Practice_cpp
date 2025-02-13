@@ -15,7 +15,6 @@ extern std::map<std::thread::id, socket_t> all_clients;
 void communication(socket_t );
 #else
 #include <pthread.h>
->>>>>>> main
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <unistd.h>
