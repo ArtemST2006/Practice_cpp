@@ -1,21 +1,21 @@
 #include <string>
 #include <cstring>
 
-void encoding(char *lis, const std::string& code){
-    int sdvig_of_encode = std::stoi(code);
+void encoding(char *lis, const std::string& code) {
+    long long sdvig_of_encode = std::stoll(code) % 256;
     for(int i = 0; lis[i] != '\0'; i++) {
-        char now_char = lis[i];
-        lis[i] = now_char + sdvig_of_encode;    
+        unsigned char now_char = static_cast<unsigned char>(lis[i]);
+        lis[i] = static_cast<char>((now_char + sdvig_of_encode) % 256);
     }
     return;
 }
 
-void decoding(char *lis, const std::string& code){
+void decoding(char *lis, const std::string& code) {
     if (strcmp(lis, "Connected") == 0 || strcmp(lis, "You are alone") == 0) return;
-    int sdvig_of_decode = std::stoi(code);
+    long long sdvig_of_decode = std::stoll(code) % 256;
     for(int i = 0; lis[i] != '\0'; i++) {
-        char now_char = lis[i];
-        lis[i] = now_char - sdvig_of_decode;
+        unsigned char now_char = static_cast<unsigned char>(lis[i]);
+        lis[i] = static_cast<char>((now_char - sdvig_of_decode + 256) % 256);
     }
     return;
 }
