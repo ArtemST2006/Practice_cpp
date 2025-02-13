@@ -8,11 +8,11 @@
 #include <winsock2.h>
 #include <thread>
 #include <windows.h>
+
 typedef SOCKET socket_t;  
-
 extern std::map<std::thread::id, socket_t> all_clients;
-
 void communication(socket_t );
+
 #else
 #include <pthread.h>
 #include <sys/socket.h>

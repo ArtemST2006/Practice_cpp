@@ -1,6 +1,7 @@
 #include <string>
 #include <cstring>
 
+
 void encoding(char *lis, const std::string& code) {
     long long sdvig_of_encode = std::stoll(code) % 256;
     for(int i = 0; lis[i] != '\0'; i++) {

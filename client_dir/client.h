@@ -39,7 +39,6 @@ extern std::string code;
 
 bool connect_server(socket_t& , sockaddr_in& );
 socket_t settings();
-
 void encoding(char *, const std::string&);
 void decoding(char *, const std::string&);
 
