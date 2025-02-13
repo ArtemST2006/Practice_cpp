@@ -9,12 +9,6 @@
 |                                                         |
 ===========================================================
 */
-
-
-
-
-
-
 #include "server.h"
 
 
@@ -34,7 +28,6 @@ void communication(socket_t clientSocket) {
     }
 
     char buffer[1024];
-
     while (true) {
         memset(buffer, 0, sizeof(buffer));
         int bytes_received = recv(clientSocket, buffer, sizeof(buffer), 0);
@@ -144,7 +137,7 @@ int setup_server(int port = 8080) {
     }
 
     #ifdef _WIN32
-    std::cout << "Win server..." << port << "..." << std::endl;
+    std::cout << "Win serevr..." << port << "..." << std::endl;
     #else
     std::cout << "Unix server..." << port << "..." << std::endl;
     #endif

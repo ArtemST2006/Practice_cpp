@@ -1,3 +1,4 @@
+
 /*  
 ===========================================================
 |   CLIENT-SERVER APPLICATION                             |
@@ -9,11 +10,6 @@
 |                                                         |
 ===========================================================
 */
-
-
-
-
-
 
 #include "server.h"
 
@@ -67,8 +63,6 @@ int main() {
         close_connection(client);
     }
     #endif
-
-
     close_connection(serverSocket);
     #ifdef _WIN32
     WSACleanup();

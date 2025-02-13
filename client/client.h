@@ -20,6 +20,7 @@
     #include <unistd.h>
     #include <stdlib.h>
     #include <errno.h>
+
     #include <pthread.h>
     using socket_t = int; 
     #define INVALID_SOCKET -1
@@ -38,5 +39,7 @@ extern std::string code;
 
 bool connect_server(socket_t& , sockaddr_in& );
 socket_t settings();
+
 void encoding(char *, const std::string&);
 void decoding(char *, const std::string&);
+
