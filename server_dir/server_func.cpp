@@ -1,5 +1,11 @@
 #include "server.h"
 
+int Server::create_chat_id(int x, int y){
+    int min_id = min(x,y);
+    int max_id = max(x,y);
+    return (min_id + max_id) * (min_id + max_id + 1) / 2 + max_id;
+}
+
 void Server::set_socket_nonblocked(const int fd){
     int flags = fcntl(fd, F_GETFL, 0);
     fcntl(fd, F_SETFL, flags | O_NONBLOCK);
@@ -53,7 +59,8 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     }
                 }
                 else if (msg.type == 2){ // личные соо
-                    //занести в бд новое соо из msg
+                    const string message_for_db = msg.buffer;
+                    storage.add_message(create_chat_id(msg.occused,msg.adress),msg.occused,message_for_db);
                     cout << msg.occused << " " << msg.buffer << " " << msg.adress << endl;
                 }
                 

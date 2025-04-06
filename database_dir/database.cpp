@@ -2,7 +2,6 @@
 
 void Storage::init_db() {
     const char* init_sql = R"(
-        PRAGMA foreign_keys = ON;
         PRAGMA journal_mode = WAL;
     )";
     sqlite3_exec(db, init_sql, nullptr, nullptr, nullptr);
@@ -10,26 +9,23 @@ void Storage::init_db() {
     const char* users_sql = R"(
         CREATE TABLE IF NOT EXISTS users (
             user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            is_admin INTEGER DEFAULT 0
+            username TEXT UNIQUE NOT NULL
         );
     )";
 
-
-    const char* chats_sql = R"(
-        CREATE TABLE IF NOT EXISTS chats (
-            chat_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            chat_data JSON NOT NULL DEFAULT '{
-                "title": "",
-                "participants": [],
-                "messages": []
-            }',
-            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    const char* messages_sql = R"(
+        CREATE TABLE IF NOT EXISTS messages (
+            message_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            chat_id INTEGER NOT NULL,
+            sender_id INTEGER NOT NULL,
+            text TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         
-        CREATE INDEX IF NOT EXISTS idx_chats_updated ON chats(last_updated);
+        CREATE INDEX IF NOT EXISTS idx_messages_chat ON messages(chat_id);
     )";
-    const char* sql_commands[] = {users_sql, chats_sql};
+
+    const char* sql_commands[] = {users_sql, messages_sql};
     char* err_msg = nullptr;
     
     for (const char* sql : sql_commands) {
@@ -61,36 +57,77 @@ void Storage::add_user(string name){
 
 }
 
-void Storage::add_message(int chat_id, int sender_id, const string text){
+bool Storage::add_message(int chat_id, int sender_id, const string text) {
     const char* sql = R"(
-        UPDATE chats 
-        SET chat_data = json_set(
-            chat_data,
-            '$.messages', 
-            json_insert(
-                json_extract(chat_data, '$.messages'),
-                '$[#]',
-                json_object(
-                    'id', json_array_length(json_extract(chat_data, '$.messages')) + 1,
-                    'sender', ?2,
-                    'text', ?3,
-                    'timestamp', datetime('now')
-                )
-            )
-        )
-        WHERE chat_id = ?1;
+        INSERT INTO messages (chat_id, sender_id, text)
+        VALUES (?, ?, ?)
     )";
 
     sqlite3_stmt* stmt;
-    int res = sqlite3_prepare_v2(db,sql,-1,&stmt,0);
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
 
-    sqlite3_bind_int(stmt,1,chat_id);
-    sqlite3_bind_int(stmt,2,sender_id);
-    sqlite3_bind_text(stmt,3,text.c_str(),-1,SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 1, chat_id);
+    sqlite3_bind_int(stmt, 2, sender_id);
+    sqlite3_bind_text(stmt, 3, text.c_str(), -1, SQLITE_TRANSIENT);
 
-    res = sqlite3_step(stmt);
-
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        cerr << "Failed to execute statement: " << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
 
     sqlite3_finalize(stmt);
+    return true;
+}
 
+vector<Message> Storage::get_messages(int chat_id, int limit = 100) {
+    const char* sql = R"(
+        SELECT m.message_id, m.sender_id, m.text, m.timestamp
+        FROM messages m
+        WHERE m.chat_id = ?
+        ORDER BY m.timestamp DESC
+        LIMIT ?
+    )";
+
+    vector<Message> messages;
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return messages;
+    }
+
+    sqlite3_bind_int(stmt, 1, chat_id);
+    sqlite3_bind_int(stmt, 2, limit);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        Message msg;
+        msg.id = sqlite3_column_int(stmt, 0);
+        msg.sender_id = sqlite3_column_int(stmt, 1);
+        msg.text = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        msg.timestamp = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        messages.push_back(msg);
+    }
+
+    sqlite3_finalize(stmt);
+    return messages;
+}
+
+void Storage::delete_messages(){
+    char* sql = "DELETE FROM messages";
+    char* err_mess;
+
+    int res = sqlite3_exec(db,sql,nullptr,nullptr,&err_mess);
+}
+
+void Storage::delete_users(){
+    char* sql = "DELETE FROM users";
+    char* err_mess;
+
+    int res = sqlite3_exec(db,sql,nullptr,nullptr,&err_mess);
 }

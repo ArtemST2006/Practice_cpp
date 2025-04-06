@@ -5,6 +5,13 @@
 using json = nlohmann::json;
 using namespace std;
 
+typedef struct Message {
+    int id;
+    int sender_id;
+    string text;
+    string timestamp;
+}Message;
+
 
 class Storage{
     public:
@@ -30,7 +37,13 @@ class Storage{
 
         void add_user(string name);
 
-        void add_message(int chat_id, int sender_id, const string text);
+        bool add_message(int chat_id, int sender_id, const string text);
+
+        vector<Message> get_messages(int ,int );
+
+        void delete_users();
+        
+        void delete_messages();
 
     private:
         sqlite3* db;

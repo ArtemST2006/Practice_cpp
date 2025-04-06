@@ -36,6 +36,7 @@ class Server {
         void send_json();
         void json_erase(int );
         void append_json(int , char* );
+        int create_chat_id(int , int );
     
     public:
         Server(const Server&) = delete;
