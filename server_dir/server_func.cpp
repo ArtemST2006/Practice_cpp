@@ -41,7 +41,7 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     lis[fd] = msg.buffer;
                     storage.add_user(lis[fd]); //add to database
                 }
-                else if (msg.type == 1){
+                else if (msg.type == 1){ // общий чат
                     message msg_new;
                     msg_new.type = msg.type;  
                     strcpy(msg_new.buffer, msg.buffer);  
@@ -52,10 +52,10 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                             send(fdms, &msg_new, sizeof(msg_new), 0);
                     }
                 }
-                else if (msg.type == 2){
-                    //send on msg.address
+                else if (msg.type == 2){ // личные соо
+                    //занести в бд новое соо из msg
+                    cout << msg.occused << " " << msg.buffer << " " << msg.adress << endl;
                 }
-                cout << msg.buffer << endl;
                 
             }
             if (count == -1 && errno != EAGAIN){

@@ -75,7 +75,7 @@ void VKStyleWindow::setupConnections(){
         connect(updateTimer, &QTimer::timeout, this, &VKStyleWindow::updateChats);
         updateTimer->start(2000); // Обновление каждые 2 секунды
         
-        // connect(sendButton, &QPushButton::clicked, this, &VKStyleWindow::sendMessage);
+        connect(sendButton, &QPushButton::clicked, this, &VKStyleWindow::sendMessage);
         // connect(messageInput, &QLineEdit::returnPressed, this, &VKStyleWindow::sendMessage);
         connect(contactsList, &QListWidget::itemClicked, this, &VKStyleWindow::selectChat);
 }
@@ -113,11 +113,16 @@ void VKStyleWindow::updateContactsList(const json& data){
 
 void VKStyleWindow::selectChat(QListWidgetItem* item){
     int chatId = item->data(Qt::UserRole).toInt();
+    current_id = chatId;
     // Здесь можно загрузить историю чата по chatId
     chatHistory->clear();
-    chatHistory->addItem("Выбран чат: " + chatId);
+    chatHistory->addItem("Выбран чат: " + item->text());
 }
 
-// void sendMessage() {
-    
-// }
+void VKStyleWindow::sendMessage() {
+    std::string str = messageInput->text().toStdString();
+    if (!str.empty() && current_id != -1){
+        client->send_message(str, current_id);
+        messageInput->clear();
+    }
+}

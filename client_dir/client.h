@@ -59,6 +59,7 @@ class Client {
         }
 
         void listen();
+        void send_message(std::string, int);
         inline int get_id() {return id;}
         inline void close_connetion() { close(socket_fd); connected = false; }
 };
@@ -95,6 +96,7 @@ private:
     QPushButton* sendButton;
     QTimer* updateTimer;
     Client* client;
+    int current_id = -1;
 
     void setupUI();
 
@@ -110,6 +112,7 @@ private slots:
     }
 
     void selectChat(QListWidgetItem* item);
+    void sendMessage();
 
     // void sendMessage();
 };

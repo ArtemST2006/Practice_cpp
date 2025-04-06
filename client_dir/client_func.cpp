@@ -51,3 +51,12 @@ void Client::listen(){
         cout << "---" << msg.buffer << endl;
     }
 }
+
+void Client::send_message(std::string str, int id_add){
+    message msg {};
+    msg.type = 2; //proteted
+    strcpy(msg.buffer, str.c_str());
+    msg.occused = id;
+    msg.adress = id_add;
+    send(socket_fd, &msg, sizeof(msg), 0);
+}
