@@ -1,6 +1,7 @@
 #include <sqlite3.h>
 #include <nlohmann/json.hpp>
 #include <iostream>
+#include <fstream>
 
 using json = nlohmann::json;
 using namespace std;
@@ -45,6 +46,10 @@ class Storage{
         
         void delete_messages();
 
+        void create_json_file(vector<Message>);
+        
+
     private:
         sqlite3* db;
+        
 };

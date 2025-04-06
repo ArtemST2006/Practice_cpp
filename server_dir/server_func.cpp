@@ -62,6 +62,7 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     const string message_for_db = msg.buffer;
                     storage.add_message(create_chat_id(msg.occused,msg.adress),msg.occused,message_for_db);
                     cout << msg.occused << " " << msg.buffer << " " << msg.adress << endl;
+                    storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
                 }
                 
             }

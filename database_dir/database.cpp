@@ -131,3 +131,25 @@ void Storage::delete_users(){
 
     int res = sqlite3_exec(db,sql,nullptr,nullptr,&err_mess);
 }
+
+
+
+void Storage::create_json_file(std::vector<Message> msgs) {
+    json j_array = json::array();
+    for (auto& msg : msgs) {
+        json j_msg;
+        j_msg["id"] = msg.id;
+        j_msg["sender_id"] = msg.sender_id;
+        j_msg["text"] = msg.text;
+        j_msg["time"] = msg.timestamp;
+        j_array.push_back(j_msg);
+    }
+
+    std::ofstream file("messages.json"); 
+    if (file.is_open()) {
+        file << j_array.dump(4);
+        file.close();
+    }
+    
+    
+}
