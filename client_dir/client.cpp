@@ -6,6 +6,7 @@ void listen_th(Client& client){
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
+    qRegisterMetaType<std::string>("std::string");
     
     {
         std::ofstream file("output.json");
@@ -24,6 +25,10 @@ int main(int argc, char* argv[]) {
     std::thread listen_thread([&client]() { client.listen(); });
     
     VKStyleWindow window;
+
+    QObject::connect(&client, &Client::check_chat, 
+        &window, &VKStyleWindow::handle_check_chat);
+
     window.setClient(&client);
     window.show();
     

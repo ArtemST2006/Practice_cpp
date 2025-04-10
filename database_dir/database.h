@@ -46,7 +46,7 @@ class Storage{
         
         void delete_messages();
 
-        void create_json_file(vector<Message>);
+        json create_json_file(vector<Message>);
         
 
     private:

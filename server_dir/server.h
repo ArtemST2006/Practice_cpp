@@ -19,7 +19,7 @@ using json = nlohmann::json;
 class Server {
     private:
         struct message {
-            int type; // 0-rename; 1-full; 2-protected; 3-update
+            int type; // 0-rename; 1-full; 2-protected, 3 - add/del /, 4 - chat
             char buffer[1024];
             int occused; // откого
             int adress; // optional куда
@@ -29,11 +29,13 @@ class Server {
         char buffer[1024];
         std::map<const int, std::string> lis; // fd(id), name
         json data;
+        json json_chat;
     
         void set_socket_nonblocked(const int);
         void settings(int );
         void handle_events(const int, epoll_event*, int);
-        void send_json();
+        void send_json(json& );
+        void send_json_chat(json&, int );
         void json_erase(int );
         void append_json(int , char* );
         int create_chat_id(int , int );

@@ -1,4 +1,5 @@
 #include "client.h"
+#include <chrono>
 
 void Client::settings(int port, std::string host){
     struct sockaddr_in serv_addr;
@@ -11,7 +12,7 @@ void Client::settings(int port, std::string host){
 
     inet_pton(AF_INET, host.c_str(), &serv_addr.sin_addr);
         
-    connect(socket_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
+    ::connect(socket_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
     //обмен id и name 
     {
@@ -32,11 +33,13 @@ void Client::listen(){
         message msg{};
         memset(msg.buffer, 0, sizeof(msg.buffer));
         if (recv(socket_fd, &msg, sizeof(msg), 0) == 0) break;
+        cout << msg.type << endl;
         if (msg.type == 1){
             //rendering general chat
         }
         else if (msg.type == 2){
-            //remember in buffer and rendering own chat
+            std::string str(msg.buffer);
+            check_chat(msg.occused, str);
         }
         else if (msg.type == 3){ //update json state
             char buffer[4096];
@@ -48,7 +51,9 @@ void Client::listen(){
             file << data.dump(4);
             file.close();
         }
-        cout << "---" << msg.buffer << endl;
+        else if (msg.type == 4){
+            current_chat = json::parse(std::string(msg.buffer, sizeof(msg.buffer)));
+        }
     }
 }
 
@@ -59,4 +64,17 @@ void Client::send_message(std::string str, int id_add){
     msg.occused = id;
     msg.adress = id_add;
     send(socket_fd, &msg, sizeof(msg), 0);
+}
+
+json& Client::give_data(int type, int sender = -1, int address = -1){
+    message msg {};
+    msg.type = type;
+    msg.adress = address;
+    msg.occused = sender;
+    if (type == 3){} // обновление списка клиентов
+    else if (type == 4){ // запрос 
+        send(socket_fd, &msg, sizeof(msg), 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200)); 
+        return current_chat;
+    }
 }

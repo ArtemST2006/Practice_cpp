@@ -119,14 +119,14 @@ vector<Message> Storage::get_messages(int chat_id, int limit = 100) {
 }
 
 void Storage::delete_messages(){
-    char* sql = "DELETE FROM messages";
+    const char* sql = "DELETE FROM messages";
     char* err_mess;
 
     int res = sqlite3_exec(db,sql,nullptr,nullptr,&err_mess);
 }
 
 void Storage::delete_users(){
-    char* sql = "DELETE FROM users";
+    const char* sql = "DELETE FROM users";
     char* err_mess;
 
     int res = sqlite3_exec(db,sql,nullptr,nullptr,&err_mess);
@@ -134,7 +134,7 @@ void Storage::delete_users(){
 
 
 
-void Storage::create_json_file(std::vector<Message> msgs) {
+json Storage::create_json_file(std::vector<Message> msgs) {
     json j_array = json::array();
     for (auto& msg : msgs) {
         json j_msg;
@@ -145,11 +145,12 @@ void Storage::create_json_file(std::vector<Message> msgs) {
         j_array.push_back(j_msg);
     }
 
-    std::ofstream file("messages.json"); 
-    if (file.is_open()) {
-        file << j_array.dump(4);
-        file.close();
-    }
+    // std::ofstream file("messages.json"); 
+    // if (file.is_open()) {
+    //     file << j_array.dump(4);
+    //     file.close();
+    // }
     
+    return j_array;
     
 }

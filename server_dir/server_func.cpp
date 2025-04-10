@@ -36,14 +36,14 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
         if (events[i].events & EPOLLHUP) {
             cout << "Disconnected " << fd << endl;
             lis.erase(fd);
-            json_erase(fd); send_json();
+            json_erase(fd); send_json(data);
             close(fd);
         } else if (events[i].events & EPOLLIN) {
             message msg{};
             ssize_t count;
             while ((count = read(fd, &msg, sizeof(msg))) > 0){
                 if (msg.type == 0){ //прислали имя
-                    append_json(fd, msg.buffer); send_json();
+                    append_json(fd, msg.buffer); send_json(data);
                     lis[fd] = msg.buffer;
                     storage.add_user(lis[fd]); //add to database
                 }
@@ -62,7 +62,12 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     const string message_for_db = msg.buffer;
                     storage.add_message(create_chat_id(msg.occused,msg.adress),msg.occused,message_for_db);
                     cout << msg.occused << " " << msg.buffer << " " << msg.adress << endl;
-                    storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
+                    msg.type = 2;
+                    send(msg.adress, &msg, sizeof(msg), 0);
+                }
+                else if (msg.type == 4){
+                    json_chat = storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
+                    send_json_chat(json_chat, msg.occused);
                 }
                 
             }
@@ -72,7 +77,7 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
             else if(count == 0){
                 cout << "Disconnected " << fd << endl;
                 lis.erase(fd);
-                json_erase(fd); send_json();
+                json_erase(fd); send_json(data);
                 close(fd);
             }
         }
@@ -127,7 +132,7 @@ void Server::communication(){
 }
 
 
-void Server::send_json(){
+void Server::send_json(json& data){
     message msg{};
     msg.type = 3;
 
@@ -137,6 +142,15 @@ void Server::send_json(){
         send(fd, &msg, sizeof(msg), 0);
         send(fd, json_str.c_str(), json_str.size(), 0);
     }
+}
+
+void Server::send_json_chat(json& data, int id){
+    message msg {};
+    msg.type = 4;
+    std::string json_str = data.dump();
+    strcpy(msg.buffer, json_str.c_str());
+
+    send(id, &msg, sizeof(msg), 0);
 }
 
 void Server::append_json(int id, char* name){

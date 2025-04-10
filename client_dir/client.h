@@ -25,6 +25,7 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QString>
+#include <QMetaType>
 #include <QObject>
 
 using std::cout;  
@@ -33,16 +34,19 @@ using std::cin;
 using json = nlohmann::json;
 
 
-class Client {
+class Client : public QObject{
+    Q_OBJECT
+
     private:
         int id;
         std::string name;
         int socket_fd;
         json data;
+        json current_chat;
         bool connected = false;
 
         struct message {
-            int type; // 0-rename; 1-full; 2-protected
+            int type; // 0-rename; 1-full; 2-protected, 3 - add/del /, 4 - chat
             char buffer[1024];
             int occused; // откого
             int adress; // optional
@@ -61,7 +65,11 @@ class Client {
         void listen();
         void send_message(std::string, int);
         inline int get_id() {return id;}
+        json& give_data(int, int, int);
         inline void close_connetion() { close(socket_fd); connected = false; }
+
+    signals:
+        void check_chat(int, std::string);
 };
 
 
@@ -105,6 +113,12 @@ private:
     void loadContacts();
 
     void updateContactsList(const json& data);
+
+    void displayMessages(const json&);
+    void add_one_message(std::string str, int mode=0);
+    
+public slots:
+    void handle_check_chat(int, std::string);
 
 private slots:
     void updateChats() {
