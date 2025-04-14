@@ -96,6 +96,8 @@ void VKStyleWindow::loadContacts(){
 
 void VKStyleWindow::updateContactsList(const json& data){
     contactsList->clear();
+    QListWidgetItem* general = new QListWidgetItem(QString::fromStdString("general"), contactsList);
+    general->setData(Qt::UserRole, 1);
         
         if (data.is_array()) {
             for (const auto& contact : data) {
@@ -132,8 +134,14 @@ void VKStyleWindow::selectChat(QListWidgetItem* item){
 void VKStyleWindow::sendMessage() {
     std::string str = messageInput->text().toStdString();
     if (!str.empty() && current_id != -1){
-        client->send_message(str, current_id);
-        add_one_message(str);
+        if (current_id == 1){ // общий чат
+            client->send_message(str, current_id, 1);
+            add_one_message(str);
+        }
+        else{
+            client->send_message(str, current_id, 2);
+            add_one_message(str);
+        }
         messageInput->clear();
     }
 }

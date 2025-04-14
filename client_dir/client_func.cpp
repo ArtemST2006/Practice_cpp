@@ -35,7 +35,8 @@ void Client::listen(){
         if (recv(socket_fd, &msg, sizeof(msg), 0) == 0) break;
         cout << msg.type << endl;
         if (msg.type == 1){
-            //rendering general chat
+            std::string str(msg.buffer);
+            check_chat(1, str);
         }
         else if (msg.type == 2){
             std::string str(msg.buffer);
@@ -57,11 +58,11 @@ void Client::listen(){
     }
 }
 
-void Client::send_message(std::string str, int id_add){
+void Client::send_message(std::string str, int id_add, int type){
     message msg {};
-    msg.type = 2; //proteted
+    msg.type = type; 
     strcpy(msg.buffer, str.c_str());
-    msg.occused = id;
+    msg.occused = id; // можно понять имя отправителя(для общего чата)
     msg.adress = id_add;
     send(socket_fd, &msg, sizeof(msg), 0);
 }

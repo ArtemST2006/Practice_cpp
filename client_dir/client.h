@@ -63,7 +63,7 @@ class Client : public QObject{
         }
 
         void listen();
-        void send_message(std::string, int);
+        void send_message(std::string, int, int);
         inline int get_id() {return id;}
         json& give_data(int, int, int);
         inline void close_connetion() { close(socket_fd); connected = false; }

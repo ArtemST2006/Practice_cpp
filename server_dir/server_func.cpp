@@ -47,12 +47,14 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     lis[fd] = msg.buffer;
                     storage.add_user(lis[fd]); //add to database
                 }
-                else if (msg.type == 1){ // общий чат
+                else if (msg.type == 1){ // общий чат 
                     message msg_new;
                     msg_new.type = msg.type;  
                     strcpy(msg_new.buffer, msg.buffer);  
                     msg_new.occused = fd;         
-                    msg_new.adress = msg.adress; 
+                    msg_new.adress = msg.adress;
+                    const string message_for_db = msg.buffer;
+                    storage.add_message(1,msg_new.occused,message_for_db);
                     for (auto [fdms, name] : lis){
                         if (fdms != fd)
                             send(fdms, &msg_new, sizeof(msg_new), 0);
@@ -66,7 +68,10 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     send(msg.adress, &msg, sizeof(msg), 0);
                 }
                 else if (msg.type == 4){
-                    json_chat = storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
+                    if (msg.adress == 1) // generak chat
+                        json_chat = storage.create_json_file(storage.get_messages(1, 100));
+                    else
+                        json_chat = storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
                     send_json_chat(json_chat, msg.occused);
                 }
                 
