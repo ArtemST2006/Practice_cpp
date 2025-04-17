@@ -28,7 +28,8 @@ add_executable(client
 add_executable(server 
     server_dir/server.cpp 
     server_dir/server_func.cpp
-    database_dir/database.cpp  # Добавлен файл базы данных
+    database_dir/database.cpp
+    crypto/crypto.cpp
 )
 
 # Подключение библиотек для клиента

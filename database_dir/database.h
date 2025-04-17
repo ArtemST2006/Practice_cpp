@@ -47,6 +47,11 @@ class Storage{
         void delete_messages();
 
         json create_json_file(vector<Message>);
+
+        bool delete_user_by_id(int user_id);
+        
+        void delete_messages_by_chat_id(int chat_id)
+
         
 
     private:
