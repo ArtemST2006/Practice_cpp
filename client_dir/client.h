@@ -13,6 +13,7 @@
 #include <thread>
 #include <nlohmann/json.hpp> 
 #include <fstream>
+#include "../crypto/crypto.h"
 #include <mutex>
 
 #include <QApplication>

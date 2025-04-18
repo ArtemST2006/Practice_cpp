@@ -42,7 +42,7 @@ void Storage::add_user(string name){
     int rc = sqlite3_prepare_v2(db,sql,-1,&stmt,0);
 
     if (rc != SQLITE_OK){
-        cerr << "Prepare faild" << endl;
+        cerr << "Prepare failed" << endl;
         return;
     }
 
@@ -153,4 +153,44 @@ json Storage::create_json_file(std::vector<Message> msgs) {
     
     return j_array;
     
+}
+
+void Storage::delete_messages_by_chat_id(int chat_id) {
+    const char* sql = "DELETE FROM messages WHERE chat_id = ?";
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+
+    sqlite3_bind_int(stmt, 1, chat_id);
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        cerr << "Failed to delete messages: " << sqlite3_errmsg(db) << endl;
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+
+bool Storage::delete_user_by_id(int user_id) {
+    const char* sql = "DELETE FROM users WHERE user_id = ?";
+    sqlite3_stmt* stmt;
+    
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, user_id);
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        cerr << "Failed to delete user: " << sqlite3_errmsg(db) << endl;
+        sqlite3_finalize(stmt);
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    return true;
 }
