@@ -35,7 +35,10 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
         int fd = events[i].data.fd;
         if (events[i].events & EPOLLHUP) {
             cout << "Disconnected " << fd << endl;
+            std::lock_guard<std::mutex> lock(lis_mutex);
             lis.erase(fd);
+            //db.delete_user
+            //send_json(storage.give_list)
             json_erase(fd); send_json(data);
             close(fd);
         } else if (events[i].events & EPOLLIN) {
@@ -43,7 +46,7 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
             ssize_t count;
             while ((count = read(fd, &msg, sizeof(msg))) > 0){
                 if (msg.type == 0){ //прислали имя
-                    append_json(fd, msg.buffer); send_json(data);
+                    append_json(fd, msg.buffer); send_json(data);//send_json(storage.give_list)
                     lis[fd] = msg.buffer;
                     storage.add_user(lis[fd]); //add to database
                 }
@@ -67,6 +70,17 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     msg.type = 2;
                     send(msg.adress, &msg, sizeof(msg), 0);
                 }
+                else if (msg.type == 3){
+                    int id = msg.adress;
+                    message msg{};
+                    msg.type = 3;
+
+                    std::string json_str = data.dump(); // db
+                    strcpy(msg.buffer, json_str.c_str());
+
+                    send(id, &msg, sizeof(msg), 0);
+                    
+                }
                 else if (msg.type == 4){
                     if (msg.adress == 1) // generak chat
                         json_chat = storage.create_json_file(storage.get_messages(1, 100));
@@ -74,14 +88,26 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                         json_chat = storage.create_json_file(storage.get_messages(create_chat_id(msg.adress,msg.occused),100));
                     send_json_chat(json_chat, msg.occused);
                 }
-                
+                else if (msg.type == 5) {// admin act...
+                    std::lock_guard<std::mutex> lock(lis_mutex);
+                    cout << "delete " << msg.adress << endl;
+                    send(msg.adress, &msg, sizeof(msg), 0);
+                    lis.erase(msg.adress);
+                    //db.delete_user
+                    //send_json(storage.give_list)
+                    json_erase(msg.adress); send_json(data);
+                    close(msg.adress);
+                }
             }
             if (count == -1 && errno != EAGAIN){
                 break;
             }
             else if(count == 0){
                 cout << "Disconnected " << fd << endl;
+                std::lock_guard<std::mutex> lock(lis_mutex);
                 lis.erase(fd);
+                //db.delete_user
+                //send_json(storage.give_list)
                 json_erase(fd); send_json(data);
                 close(fd);
             }
@@ -125,6 +151,7 @@ void Server::communication(){
                     { // обмен предварительными данными
                         int netid = htonl(client_fd);
                         send(client_fd, (char*)&netid, sizeof(netid), 0);
+                        std::lock_guard<std::mutex> lock(lis_mutex);
                         lis[client_fd] = "";
                     }
                 }
@@ -141,11 +168,11 @@ void Server::send_json(json& data){
     message msg{};
     msg.type = 3;
 
-    std::string json_str = data.dump();
+    std::string json_str = data.dump(); // db
+    strcpy(msg.buffer, json_str.c_str());
 
     for (auto [fd, name] : lis){
         send(fd, &msg, sizeof(msg), 0);
-        send(fd, json_str.c_str(), json_str.size(), 0);
     }
 }
 

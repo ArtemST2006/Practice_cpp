@@ -1,6 +1,7 @@
 #include "client.h"
 
 void VKStyleWindow::setupUI(){
+    cout << "setupUI" << endl;
     // Главный виджет и layout
     QWidget* centralWidget = new QWidget(this);
     QHBoxLayout* mainLayout = new QHBoxLayout(centralWidget);
@@ -67,12 +68,15 @@ void VKStyleWindow::setupUI(){
     
     setCentralWidget(centralWidget);
     resize(800, 600);
-    setWindowTitle("Messenger");
+    setWindowTitle(QString::fromStdString(client->get_name()));
 
     contactsList->setStyleSheet("QListView::item { border: none; }");
+
+    cout << "setupUI end" << endl;
 }
 
 void VKStyleWindow::setupConnections(){
+    cout << "setupConnections" << endl;
     updateTimer = new QTimer(this);
         connect(updateTimer, &QTimer::timeout, this, &VKStyleWindow::updateChats);
         updateTimer->start(2000); // Обновление каждые 2 секунды
@@ -80,25 +84,31 @@ void VKStyleWindow::setupConnections(){
         connect(sendButton, &QPushButton::clicked, this, &VKStyleWindow::sendMessage);
         connect(messageInput, &QLineEdit::returnPressed, this, &VKStyleWindow::sendMessage);
         connect(contactsList, &QListWidget::itemClicked, this, &VKStyleWindow::selectChat);
+
+        cout << "setupConnections end" << endl;
 }
 
 void VKStyleWindow::loadContacts(){
+    cout << "loadContacts" << endl; 
+    if (!client) {
+        cout << "Ошибка Клиент не инициализирован" << endl;
+    }
     try {
-        std::ifstream file("output.json");
-        if (file) {
-            json data = json::parse(file);
-            updateContactsList(data);
-        }
+        json data_list = client->give_data(3, client->get_id(), -1); //запрос json клиентов
+        updateContactsList(data_list);
+        
     } catch (...) {
         QMessageBox::critical(this, "Ошибка", "Не удалось загрузить контакты");
     }
+    cout << "loadContacts end " << endl;
 }
 
-void VKStyleWindow::updateContactsList(const json& data){
+void VKStyleWindow::updateContactsList(const json& data){ 
+    cout << "updateContactList" << endl;
     contactsList->clear();
     QListWidgetItem* general = new QListWidgetItem(QString::fromStdString("general"), contactsList);
     general->setData(Qt::UserRole, 1);
-        
+        cout << "111" << endl;//mist
         if (data.is_array()) {
             for (const auto& contact : data) {
                 int id = contact["id"];
@@ -117,14 +127,30 @@ void VKStyleWindow::updateContactsList(const json& data){
                 }
             }
         }
+        cout << "updateContactList end" << endl;
 }
 
 void VKStyleWindow::selectChat(QListWidgetItem* item){
     int chatId = item->data(Qt::UserRole).toInt();
     item->setBackground(QColor(200, 220, 255));
     current_id = chatId;
+
+    if (client->get_admin_flag() && current_id != 1){
+        QMessageBox adminDialog;
+        adminDialog.setWindowTitle("действия");
     
-    json& current_chat = client->give_data(4, client->get_id(), current_id);
+        QPushButton *openChatBtn = adminDialog.addButton("Открыть чат", QMessageBox::ActionRole);
+        QPushButton *deleteUserBtn = adminDialog.addButton("Удалить пользователя", QMessageBox::ActionRole);
+
+        adminDialog.exec();
+        
+        if (adminDialog.clickedButton() == deleteUserBtn) {
+            client->delete_user(current_id);
+            return;
+        }
+    }
+
+    json current_chat = client->give_data(4, client->get_id(), current_id);
     
     chatHistory->clear();
     chatHistory->addItem("Выбран чат: " + item->text());

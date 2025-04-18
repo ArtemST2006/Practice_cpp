@@ -43,17 +43,13 @@ void Client::listen(){
             check_chat(msg.occused, str);
         }
         else if (msg.type == 3){ //update json state
-            char buffer[4096];
-            int bytes_received = recv(socket_fd, buffer, sizeof(buffer), 0);
-
-            data = json::parse(std::string(buffer, bytes_received));
-
-            std::ofstream file("output.json", std::ios::binary);
-            file << data.dump(4);
-            file.close();
+            data = json::parse(std::string(msg.buffer, sizeof(msg.buffer)));
         }
         else if (msg.type == 4){
             current_chat = json::parse(std::string(msg.buffer, sizeof(msg.buffer)));
+        }
+        else if(msg.type == 5){
+            close_window();
         }
     }
 }
@@ -67,15 +63,27 @@ void Client::send_message(std::string str, int id_add, int type){
     send(socket_fd, &msg, sizeof(msg), 0);
 }
 
-json& Client::give_data(int type, int sender = -1, int address = -1){
+json Client::give_data(int type, int sender = -1, int address = -1){
+    cout << "order" << type << endl;
     message msg {};
     msg.type = type;
     msg.adress = address;
     msg.occused = sender;
-    if (type == 3){} // обновление списка клиентов
+    if (type == 3){ // обновление списка клиентов
+        send(socket_fd, &msg, sizeof(msg), 0);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200)); 
+        return data;
+    } 
     else if (type == 4){ // запрос 
         send(socket_fd, &msg, sizeof(msg), 0);
         std::this_thread::sleep_for(std::chrono::milliseconds(200)); 
         return current_chat;
     }
+}
+
+void ClientAdmin::delete_user(int id){
+    message msg{};
+    msg.type = 5;
+    msg.adress = id;
+    send(socket_fd, &msg, sizeof(msg), 0);
 }

@@ -9,6 +9,7 @@
 #include <sys/epoll.h>
 #include <map>
 #include <string>
+#include <mutex>
 #include <nlohmann/json.hpp> 
 #include "../database_dir/database.h"
 
@@ -30,6 +31,7 @@ class Server {
         std::map<const int, std::string> lis; // fd(id), name
         json data;
         json json_chat;
+        std::mutex lis_mutex; 
     
         void set_socket_nonblocked(const int);
         void settings(int );
