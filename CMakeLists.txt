@@ -12,16 +12,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Поиск необходимых компонентов
 find_package(Qt5 REQUIRED COMPONENTS Core Widgets Network)
-find_package(SQLite3 REQUIRED)  # Добавлен поиск SQLite
+find_package(SQLite3 REQUIRED)
 
 # Установка выходной директории
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+# 🔧 Общие исходники
+set(CRYPTO_SRC
+    crypto/crypto.cpp
+)
 
 # Клиентское приложение (с GUI)
 add_executable(client 
     client_dir/client.cpp 
     client_dir/client_func.cpp
     client_dir/window_func.cpp
+    ${CRYPTO_SRC} # ← добавлен crypto.cpp для клиента
 )
 
 # Серверное приложение (без GUI)
@@ -29,7 +35,7 @@ add_executable(server
     server_dir/server.cpp 
     server_dir/server_func.cpp
     database_dir/database.cpp
-    crypto/crypto.cpp
+    ${CRYPTO_SRC}
 )
 
 # Подключение библиотек для клиента
@@ -43,7 +49,7 @@ target_link_libraries(client PRIVATE
 target_link_libraries(server PRIVATE
     Qt5::Core
     Qt5::Network
-    SQLite::SQLite3  # Добавлена SQLite библиотека
+    SQLite::SQLite3
 )
 
 # Для Windows дополнительно подключаем Winsock
@@ -62,5 +68,6 @@ include_directories(
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
-    ${SQLite3_INCLUDE_DIRS}  # Добавлены пути SQLite
+    ${SQLite3_INCLUDE_DIRS}
+    crypto  # 🔍 Подключён путь к заголовкам Crypto
 )
