@@ -44,9 +44,9 @@ int main(int argc, char* argv[]) {
     
     Client* client = nullptr;
     if (isAdmin)
-        client = new ClientAdmin(name.toStdString(), 8080, "127.0.0.1");
+        client = new ClientAdmin(name.toStdString(), 8080, "172.20.10.3");
     else 
-        client = new Client(name.toStdString(), 8080, "127.0.0.1");
+        client = new Client(name.toStdString(), 8080, "172.20.10.3");
 
     std::thread listen_thread([client]() { client->listen(); });
 

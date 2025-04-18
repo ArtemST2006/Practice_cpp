@@ -37,7 +37,12 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
             cout << "Disconnected " << fd << endl;
             std::lock_guard<std::mutex> lock(lis_mutex);
             lis.erase(fd);
-            //db.delete_user
+            for (auto [id,name] : lis){
+                    int chat_id = create_chat_id(fd,id);
+                    storage.delete_messages_by_chat_id(chat_id);
+                    
+            }
+            storage.delete_user_by_id(fd);
             //send_json(storage.give_list)
             json_erase(fd); send_json(data);
             close(fd);
@@ -93,8 +98,13 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                     cout << "delete " << msg.adress << endl;
                     send(msg.adress, &msg, sizeof(msg), 0);
                     lis.erase(msg.adress);
-                    //db.delete_user
-                    //send_json(storage.give_list)
+                    lis.erase(fd);
+                    for (auto [id,name] : lis){
+                        int chat_id = create_chat_id(fd,id);
+                        storage.delete_messages_by_chat_id(chat_id);
+                    
+                    }
+                    storage.delete_user_by_id(fd);
                     json_erase(msg.adress); send_json(data);
                     close(msg.adress);
                 }
@@ -106,7 +116,12 @@ void Server::handle_events(int epoll_fd, epoll_event* events, int ndfs){
                 cout << "Disconnected " << fd << endl;
                 std::lock_guard<std::mutex> lock(lis_mutex);
                 lis.erase(fd);
-                //db.delete_user
+                for (auto [id,name] : lis){
+                    int chat_id = create_chat_id(fd,id);
+                    storage.delete_messages_by_chat_id(chat_id);
+                    
+                }
+                storage.delete_user_by_id(fd);
                 //send_json(storage.give_list)
                 json_erase(fd); send_json(data);
                 close(fd);

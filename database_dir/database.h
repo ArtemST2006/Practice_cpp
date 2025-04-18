@@ -50,7 +50,7 @@ class Storage{
 
         bool delete_user_by_id(int user_id);
         
-        void delete_messages_by_chat_id(int chat_id)
+        void delete_messages_by_chat_id(int chat_id);
 
         
 
